@@ -1,47 +1,36 @@
-# This is the content for your build.yml file
-
 name: Build Android APK with Buildozer
 
-# This tells GitHub to start the build every time you push new code to your "main" branch
 on:
   push:
     branches: [ "main" ]
 
 jobs:
   build:
-    # This sets up a clean, fresh Ubuntu Linux machine for the build
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checks out a copy of your repository (main.py and buildozer.spec) onto the machine
-      - name: Checkout repository
-        uses: actions/checkout@v3
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-      # Step 2: Sets up the correct version of Java, which Android needs
-      - name: Set up JDK 11
-        uses: actions/setup-java@v3
-        with:
-          java-version: '11'
-          distribution: 'temurin'
+    - name: Set up JDK 11
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+        distribution: 'temurin'
 
-      # Step 3: Installs the essential Python and system libraries needed for the build
-      - name: Install Buildozer and dependencies
-        run: |
-          pip install --upgrade buildozer cython==0.29.36
-          sudo apt-get update
-          sudo apt-get install -y git zip unzip libffi-dev libgmp-dev
+    - name: Install Buildozer and dependencies
+      run: |
+        pip install --upgrade buildozer cython==0.29.36
+        sudo apt-get update
+        sudo apt-get install -y git zip unzip libffi-dev libgmp-dev
 
-      # Step 4: This is the main command. It runs Buildozer, which will read your buildozer.spec file.
-      # It will automatically accept the Android SDK licenses.
-      - name: Build with Buildozer
-        run: |
-          buildozer --version
-          buildozer android debug
+    - name: Build with Buildozer
+      run: |
+        buildozer --version
+        buildozer android debug
 
-      # Step 5: If the build is successful, this step takes the finished APK file...
-      - name: Upload APK
-        uses: actions/upload-artifact@v3
-        with:
-          # ...and uploads it as a downloadable file named "translator-apk"
-          name: translator-apk
-          path: bin/*.apk
+    - name: Upload APK
+      uses: actions/upload-artifact@v4  # <-- THIS IS THE ONLY CHANGE
+      with:
+        name: translator-apk
+        path: bin/*.apk
