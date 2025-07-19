@@ -12,10 +12,12 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Set up JDK 11
+    # --- THIS IS THE ONLY CHANGE ---
+    # We are now setting up Java 17, which the Android tools require.
+    - name: Set up JDK 17
       uses: actions/setup-java@v3
       with:
-        java-version: '11'
+        java-version: '17'
         distribution: 'temurin'
 
     - name: Install Buildozer and dependencies
@@ -24,16 +26,14 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y git zip unzip libffi-dev libgmp-dev
 
-    # --- THIS IS THE NEW, ROBUST LICENSE ACCEPTANCE STEP ---
     - name: Find and Accept Android SDK licenses
       run: |
-        # First, find the sdkmanager path, wherever it may be
+        # This robust method is still the best way.
         SDKMANAGER_PATH=$(find $ANDROID_HOME -name "sdkmanager" | head -n 1)
         if [ -z "$SDKMANAGER_PATH" ]; then
           echo "Could not find sdkmanager"
           exit 1
         fi
-        # Now, accept the licenses using the found path
         yes | $SDKMANAGER_PATH --licenses
 
     - name: Build with Buildozer
