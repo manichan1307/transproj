@@ -24,10 +24,17 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y git zip unzip libffi-dev libgmp-dev
 
-    # --- THIS IS THE NEW, CRUCIAL STEP ---
-    - name: Accept Android SDK licenses
+    # --- THIS IS THE NEW, ROBUST LICENSE ACCEPTANCE STEP ---
+    - name: Find and Accept Android SDK licenses
       run: |
-        yes | $ANDROID_HOME/tools/bin/sdkmanager --licenses
+        # First, find the sdkmanager path, wherever it may be
+        SDKMANAGER_PATH=$(find $ANDROID_HOME -name "sdkmanager" | head -n 1)
+        if [ -z "$SDKMANAGER_PATH" ]; then
+          echo "Could not find sdkmanager"
+          exit 1
+        fi
+        # Now, accept the licenses using the found path
+        yes | $SDKMANAGER_PATH --licenses
 
     - name: Build with Buildozer
       run: |
